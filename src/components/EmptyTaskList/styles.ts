@@ -4,8 +4,7 @@ export const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginHorizontal: 24,
-        marginTop: 24,
+        marginTop: 18,
         paddingTop: 56,
         borderTopWidth: 0.5,
         borderTopColor: '#808080'

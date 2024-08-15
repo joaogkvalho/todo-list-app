@@ -17,6 +17,8 @@ export function Home() {
     const [taskList, setTaskList] = useState<Task[]>([])
     const [task, setTask] = useState('')
 
+    const isTaskEmpty = task.trim().length === 0
+
     const [completedTasksCount, setCompletedTasksCount] = useState(0)
 
     function handleAddTask() {
@@ -79,6 +81,7 @@ export function Home() {
 
                 <TouchableOpacity 
                     onPress={handleAddTask}
+                    disabled={isTaskEmpty}
                     style={styles.submitButton}
                 >
                     <AntDesign
