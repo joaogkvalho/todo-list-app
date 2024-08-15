@@ -1,32 +1,65 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { styles } from "./styles";
 
 import { useState } from "react";
 import logoImg from "../../assets/logo.png";
-import { TaskList } from "../../components/TaskList";
+import { EmptyTaskList } from "../../components/EmptyTaskList";
+import { Task } from "../../components/Task";
+
+type Task = {
+    id: string
+    content: string
+    isComplete: boolean
+}
 
 export function Home() {
-    const [taskList, setTaskList] = useState([
-        {
-            id: '1',
-            content: 'Acordar',
-            isComplete: false
-        },
-        // {
-        //     id: '2',
-        //     content: 'Fazer café da manhã',
-        //     isComplete: false
-        // },
-        // {
-        //     id: '3',
-        //     content: 'Ir para o trabalho',
-        //     isComplete: false
-        // }
-    ])
+    const [taskList, setTaskList] = useState<Task[]>([])
+    const [task, setTask] = useState('')
+
+    const [completedTasksCount, setCompletedTasksCount] = useState(0)
 
     function handleAddTask() {
-        console.log("Tarefa adicionada!")
+        const newTask = {
+            id: Math.random().toString(),
+            content: task,
+            isComplete: false
+        }
+        
+        setTaskList(prevState => [...prevState, newTask])
+        setTask('')
+    }
+
+    function handleCompleteTask(taskId: string) {
+        setTaskList(prevState => prevState.map(task => 
+            task.id === taskId ? {...task, isComplete: !task.isComplete} : task
+        ))
+
+        countCompletedTasks(taskId)
+    }
+
+    function countCompletedTasks(taskId: string) {
+        for (const task of taskList) {
+            if (task.id === taskId && !task.isComplete) {
+                setCompletedTasksCount(completedTasksCount + 1)
+            } else if(task.id === taskId && completedTasksCount > 0) {
+                setCompletedTasksCount(completedTasksCount - 1)
+            }
+        }
+    }
+
+    function handleRemoveTask(taskToDelete: Task) {
+        const tasksWithoutDeletedTask = taskList.filter(task => {
+            return task.content !== taskToDelete.content
+        })
+
+        const isTaskCompleted = taskToDelete.isComplete
+
+        if (isTaskCompleted) {
+            setCompletedTasksCount(completedTasksCount - 1)
+        }
+
+        setTaskList(tasksWithoutDeletedTask)
     }
 
     return (
@@ -38,6 +71,8 @@ export function Home() {
            <View style={styles.form}>
                 <TextInput 
                     style={styles.input}
+                    value={task}
+                    onChangeText={setTask}
                     placeholder="Adicione uma nova tarefa"
                     placeholderTextColor="#808080"
                 />
@@ -54,7 +89,7 @@ export function Home() {
                 </TouchableOpacity>
            </View>
 
-           <View style={styles.tasksResume}>
+            <View style={styles.tasksResume}>
                 <View style={styles.taskResumeItem}>
                     <Text style={{ 
                         fontSize: 16,
@@ -65,7 +100,7 @@ export function Home() {
                     </Text>
                     <View style={styles.taskResumeItemNumber}>
                         <Text style={{ color: '#fff' }}>
-                            3
+                            {taskList.length}
                         </Text>
                     </View>
                 </View>
@@ -80,14 +115,29 @@ export function Home() {
                     </Text>
                     <View style={styles.taskResumeItemNumber}>
                         <Text style={{ color: '#fff' }}>
-                            0
+                            {completedTasksCount > 0
+                                ? (`${completedTasksCount} de ${taskList.length}`)
+                                : 0
+                            }
                         </Text>
                     </View>
                 </View>
-           </View>
+            </View>
 
-            <TaskList
-                taskList={taskList}
+            <FlatList
+                data={taskList}
+                keyExtractor={task => task.id}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={EmptyTaskList}
+                renderItem={({ item }) => (
+                    <Task
+                        key={item.id}
+                        task={item}
+                        onCompleteTask={handleCompleteTask}
+                        onDeleteTask={handleRemoveTask}
+                    />
+                )}
+                style={{ paddingHorizontal: 24, marginBottom: 24 }}
             />
         </View>
     )

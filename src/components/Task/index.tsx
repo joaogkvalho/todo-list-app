@@ -1,5 +1,4 @@
 import Feather from '@expo/vector-icons/Feather';
-import { useState } from 'react';
 import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from './styles';
 
@@ -11,23 +10,23 @@ type Task = {
 
 type TaskProps = {
     task: Task
+    onCompleteTask: (taskId: string) => void
+    onDeleteTask: (task: Task) => void
 }
 
-export function Task({ task }: TaskProps) {
-    const [isCompleted, setIsCompleted] = useState(false)
-
+export function Task({ task, onCompleteTask, onDeleteTask }: TaskProps) {
     function handleCompleteTask() {
-        if (!isCompleted) {
-            setIsCompleted(true)
-        } else {
-            setIsCompleted(false)
-        }
+       onCompleteTask(task.id)
+    }
+
+    function handleDeleteTask() {
+        onDeleteTask(task)
     }
 
     return (
         <View style={styles.taskContainer}>
             <TouchableOpacity style={styles.taskContent} onPress={handleCompleteTask}>
-                {isCompleted ? (
+                {task.isComplete ? (
                     <Feather name="check-circle" size={20} color="#5E60CE" />
                 ) : (
                     <Feather name="circle" size={20} color="#4EA8DE" />
@@ -35,13 +34,13 @@ export function Task({ task }: TaskProps) {
 
                 <Text style={[
                     styles.taskContentText, 
-                    isCompleted && { color: '#808080', textDecorationLine: 'line-through' }
+                    task.isComplete && { color: '#808080', textDecorationLine: 'line-through' }
                 ]}>
                     {task.content}
                 </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleDeleteTask}>
                 <Feather name="trash-2" size={22} color="#808080" />
             </TouchableOpacity>
         </View>

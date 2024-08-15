@@ -45,6 +45,7 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 16,
+        marginBottom: 24,
         paddingHorizontal: 24,
     },
     taskResumeItem: {
@@ -57,5 +58,5 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 999,
         backgroundColor: '#333333'
-    }
+    },
 })
